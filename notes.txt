@@ -1,0 +1,21 @@
+main.rs:
+    - creates new instance of server and calls run function
+
+server.rs:
+    - struct: contains an IP address
+    - fn run: 
+        - creates tcp listener and binds to server's address
+        - listens for requests
+        - on successful request, stream containing request is read into buffer and printed
+        - on error, error is printed
+
+http:
+    - method.rs: contains method enum (GET, POST, DELETE, etc)
+    - request.rs: 
+        - contains request struct (path, query_string, method)
+        - contains custom error types and conversions from buffer to request pieces
+    - mod.rs: bundles up method and request submodules under http module
+
+
+Result type returns Ok(...) or Err(...)
+Option type returns Some(...) or None(...)

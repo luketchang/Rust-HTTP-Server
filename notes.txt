@@ -24,3 +24,10 @@ Semicolon implies not returning thing
 
 #![...] applies attribute to document
 #[] applies to preceding thing (derive(Debug allows us to us debug on Request type))
+
+Deriving Copy and Clone allows you to turn make a stack copy of a heap allocated value (need it to debug/print status codes)
+
+Static Dispatch: used to make response.send function generic over all types that the send function is called on (creates new
+function versions for each type at compile time)
+
+Traits allow you to define shared behavior and customize across specific use cases

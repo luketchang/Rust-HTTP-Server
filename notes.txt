@@ -19,3 +19,8 @@ http:
 
 Result type returns Ok(...) or Err(...)
 Option type returns Some(...) or None(...)
+
+Semicolon implies not returning thing
+
+#![...] applies attribute to document
+#[] applies to preceding thing (derive(Debug allows us to us debug on Request type))

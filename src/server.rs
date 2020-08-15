@@ -1,5 +1,7 @@
 use std::io::Read;
 use std::net::TcpListener;
+use crate::http::{ Request, Method, QueryString };
+use std::convert::TryFrom;
 
 /* Struct: Server
  * ______________
@@ -17,7 +19,7 @@ pub struct Server {
  *      - takes in self parameter
  *      - listens for tcp binding
  *      - runs loop that establishes connection and listens for requests
- *      - once request is received and written into buffer successfully, print request text
+ *      - once request is received and written into buffer successfully, convert it to Request type
  */
 impl Server {
     pub fn new(address: String) -> Self {
@@ -40,6 +42,13 @@ impl Server {
                     match stream.read(&mut buffer) {
                         Ok(_) => {
                             println!("Received request: {}", String::from_utf8_lossy(&buffer));
+
+                            match Request::try_from(&buffer[..]) {
+                                Ok(request) => {
+                                    dbg!(request);
+                                }
+                                Err(e) => println!("Failed to parse request: {}", e)
+                            }
                         }
                         Err(e) => println!("Failed to read connection: {}", e),
                     }

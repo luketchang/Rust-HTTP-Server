@@ -1,28 +1,24 @@
 
-use super::method:: { Method, MethodError };
 use std::convert::TryFrom;
 use std::error::Error;
 use std::str;
 use std::str::Utf8Error;
 use std::fmt::{ Display, Debug, Formatter, Result as FmtResult };
+use super::method::{ Method, MethodError };
+use super::query_string::QueryString;
 
 /* Struct: Request
  * ______________________
  *  - request object which contains request path, query string, and method type
+ *  - using heap strings so request components are references to the original request read into the buffer
+ *    (not new strings)
  *  - example: GET /search?user='me' HTTP/1.1
  */
-pub struct Request {
-    path: String,
-    query_string: Option<String>,
+#[derive(Debug)]
+pub struct Request<'buf>{
+    path: &'buf str,
+    query_string: Option<QueryString<'buf>>,
     method: Method
-}
-
-/* Implementation: Request 
- * _______________________
- *  
- */
-impl Request {
-    
 }
 
 /* Implementation: TryFrom<&[u8]> for Request
@@ -30,17 +26,22 @@ impl Request {
  *  - conversion method from buffer (&[u8]) to Request object
  *  - returns custom ParseErrors
  *  - Function: try_from
+ *      - has lifetime 'buf because it is returning a request, which has the lifetime 'buf
+ *      - since all of the pieces of the request are derived from the buffer, the buffer is also
+ *        given the 'buf lifetime so the pieces aren't lost once the function return
  *      - converts buffer into string
  *      - calls get_next_word function three times, each time setting the specific needed 
  *        value and updating request with the truncated string
  *      - if protocol isn't HTTP/1.1, return error
  *      - convert method string into Method enum type using parse
- *      - convert path component into the url path and query string pieces
+ *      - convert path component into the url path and query string pieces (query string converted to 
+ *        custom QueryString hashmap type)
+ *      - return a Request instance using those pieces
  */
-impl TryFrom<&[u8]> for Request {
+impl<'buf> TryFrom<&'buf [u8]> for Request<'buf> {
     type Error = ParseError;
 
-    fn try_from(buf: &[u8]) -> Result<Self, Self::Error> {
+    fn try_from(buf: &'buf [u8]) -> Result<Request<'buf>, Self::Error> {
         let request = str::from_utf8(buf)?;
 
         let (method, request) = get_next_word(request).ok_or(ParseError::InvalidRequest)?;
@@ -55,11 +56,15 @@ impl TryFrom<&[u8]> for Request {
 
         let mut query_string = None;
         if let Some(i) = path.find("?") {
-            query_string = Some(&path[i+1..]);
+            query_string = Some(QueryString::from(&path[i+1..]));
             path = &path[..i];
         }
 
-        unimplemented!()
+        Ok(Self {
+            path,
+            query_string,
+            method
+        })
     }
 }
 /* Function: get_next_word

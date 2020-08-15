@@ -1,5 +1,10 @@
 use std::str::FromStr;
 
+/* Enum: Method
+ * ______________
+ *  - enum for each method type
+ */
+#[derive(Debug)]
 pub enum Method {
     GET,
     DELETE,
@@ -12,6 +17,11 @@ pub enum Method {
     PATH
 }
 
+/* Implementation: FromStr for Method
+ * ______________
+ *  - conversion from string to method type
+ *  - returns Ok(...) because the conversion returns a result 
+ */
 impl FromStr for Method {
     type Err = MethodError;
 

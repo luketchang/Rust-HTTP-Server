@@ -8,7 +8,7 @@ use super::method::{ Method, MethodError };
 use super::query_string::QueryString;
 
 /* Struct: Request
- * ______________________
+ * _______________
  *  - request object which contains request path, query string, and method type
  *  - using heap strings so request components are references to the original request read into the buffer
  *    (not new strings)
@@ -21,6 +21,12 @@ pub struct Request<'buf>{
     method: Method
 }
 
+/* Implementation: Request
+ * _______________________
+ *  - getters for Request fields
+ *  - query_string returns optional with reference to query string (default would've been reference to optional)
+ *  - as_ref converts &Option<QueryString> to Optional<&QueryString>
+ */
 impl <'buf> Request<'buf> {
     pub fn path(&self) -> &str {
         &self.path
